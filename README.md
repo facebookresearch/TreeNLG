@@ -4,7 +4,7 @@ Code and dataset supporting the paper:
 
 Anusha Balakrishnan, Jinfeng Rao, Kartikeya Upasani, Michael White and Rajen Subba. Constrained Decoding for Neural NLG from Compositional Representations in Task-Oriented Dialogue. To appear in *Proc. ACL-19*.
 
-If you find this code or data useful in your research, please consider citing using the following BibTeX entry:
+If you find this code or dataset useful in your research, please consider citing using the following BibTeX entry:
 
 ```
 @InProceedings{Balakrishnan2019constrainednlg,
