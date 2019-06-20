@@ -18,7 +18,7 @@ note = {To appear}
 ```
 
 ## Data
-Our dataset contains ~31K examples of complex natural language responses in the **weather** domain and ~51k in **E2E** challenge. Each response was collected by providing annotators with a *user query*, a *compositional meaning representation* (with discourse relations and dialog acts), and a *context*. Currently *context* is not provided yet but we will release soon. All of these are made available in our dataset. See our linked paper for more details.
+Our dataset contains ~31K examples of complex natural language responses in the **weather** domain, and ~51k examples from the **[E2E challenge](https://github.com/tuetschek/e2e-dataset)**, both for English. Each response was collected by providing annotators, who are native English speakers, with a *user query*, a *compositional meaning representation* (with discourse relations and dialog acts), and a *context*. Currently *context* is not provided yet but we will release soon. All of these are made available in our dataset. See our linked paper for more details.
 
 
 #### We are currently preparing code for release, and plan to add it to this repository as soon as possible. Stay tuned for updates!
