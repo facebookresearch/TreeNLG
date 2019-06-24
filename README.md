@@ -32,3 +32,6 @@ E2E      | 42061  |  4672 |  4693  |  230
 `Disc_Test` is a more challenging subset of our test set that contains discourse relations, which is also the subset we report results in `Disc` column in Table 7 in our paper. Note that there are some minor differences of data statistics to our paper, please use the statistics above.
 
 #### We are currently preparing code for release, and plan to add it to this repository as soon as possible. Stay tuned for updates!
+
+### License
+TreeNLG is released under [CC-BY-NC-4.0](https://creativecommons.org/licenses/by-nc/4.0/legalcode), see [LICENSE](LICENSE.md) for details.
