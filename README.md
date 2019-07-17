@@ -20,16 +20,39 @@ note = {To appear}
 ```
 
 ## Data
-Our dataset contains ~31K examples of complex natural language responses in the **weather** domain, and ~51k examples from the **[E2E challenge](https://github.com/tuetschek/e2e-dataset)**, both for English. Each response was collected by providing annotators, who are native English speakers, with a *user query*, a *compositional meaning representation* (with discourse relations and dialog acts), and a *context*. Currently *context* is not provided yet but we will release soon. All of these are made available in our dataset. See our linked paper for more details.
+In addition to the **weather** and enriched **[E2E challenge](https://github.com/tuetschek/e2e-dataset)** dataset from our paper, we released another **weather_challenge** dataset, which contains harder weather scenarios in train/val/test files.
+Each response was collected by providing annotators, who are native English speakers, with a *user query*, a *compositional meaning representation* (with discourse relations and dialog acts), and a *context*. Currently *context* is not provided yet but we will release soon. All of these are made available in our dataset. See our linked paper for more details.
 
 #### Data Statistics
 
 Dataset  |  Train |  Val  |  Test  |  Disc_Test  
 ---------|--------|-------|--------|-----------
 Weather  | 25390  |  3078 |  3121  |  454        
+Weather_Challenge  | 32684  |  3397 |  3382  |  -        
 E2E      | 42061  |  4672 |  4693  |  230        
 
 `Disc_Test` is a more challenging subset of our test set that contains discourse relations, which is also the subset we report results in `Disc` column in Table 7 in our paper. Note that there are some minor differences of data statistics to our paper, please use the statistics above.
+
+### Results
+We noticed that slightly higher numbers can be obtained by tuning hyper-parameters compared to the numbers we reported in our paper. Therefore, we update all the automatic numbers (BLEU and tree accuracy) here and please use numbers below when citing our results. For tree accuracy, we report the number on the whole test set, as well as on two disjoint subsets: **no-discourse** subset that contains examples without any discourse act; **discourse** subset contains example with 1+ discourse acts.
+
+##### Weather Dataset
+Dataset     |  BLEU |  TreeAcc(whole)  |  TreeAcc(no-discourse)  |  TreeAcc(discourse)  
+------------|-------|------------------|-------------------------|-----------
+S2S-Tree    | -     |  94.00  |  96.66  |  86.59        
+S2S-Constr  | -     |  97.15   | 98.76  |  94.45         
+  
+##### Weather Challenge Dataset
+Dataset     |  BLEU |  TreeAcc(whole)  |  TreeAcc(no-discourse)  |  TreeAcc(discourse)  
+------------|-------|------------------|-------------------------|-----------
+S2S-Tree    | 76.75     |  91.10  |  96.62  |  83.3       
+S2S-Constr  | 77.45     |  95.74   | 98.52  |  91.61       
+
+##### E2E Dataset
+Dataset     |  BLEU |  TreeAcc(whole)  |  TreeAcc(no-discourse)  |  TreeAcc(discourse)  
+------------|-------|------------------|-------------------------|-----------
+S2S-Tree    | 74.58    |  97.06  |  99.68  |  95.28       
+S2S-Constr  | 74.69    |  99.25   | 99.89  |  97.78  
 
 #### We are currently preparing code for release, and plan to add it to this repository as soon as possible. Stay tuned for updates!
 
