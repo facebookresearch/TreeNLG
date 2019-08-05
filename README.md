@@ -41,7 +41,7 @@ Dataset     |  BLEU |  TreeAcc(whole)  |  TreeAcc(no-discourse)  |  TreeAcc(disc
 ------------|-------|------------------|-------------------------|-----------
 S2S-Tree    | -     |  94.00  |  96.66  |  86.59        
 S2S-Constr  | -     |  97.15   | 98.76  |  94.45         
-  
+
 ##### Weather Challenge Dataset
 Dataset     |  BLEU |  TreeAcc(whole)  |  TreeAcc(no-discourse)  |  TreeAcc(discourse)  
 ------------|-------|------------------|-------------------------|-----------
@@ -54,7 +54,15 @@ Dataset     |  BLEU |  TreeAcc(whole)  |  TreeAcc(no-discourse)  |  TreeAcc(disc
 S2S-Tree    | 74.58    |  97.06  |  99.68  |  95.28       
 S2S-Constr  | 74.69    |  99.25   | 99.89  |  97.78  
 
-#### We are currently preparing code for release, and plan to add it to this repository as soon as possible. Stay tuned for updates!
+## Code
+
+Computing tree accuracy:
+
+```
+python compute_tree_acc.py -tsv ~/seq2seq_out.tsv
+```
+
+Output file should be tab-separated with columns `id, input, pred, target`.
 
 ### License
 TreeNLG is released under [CC-BY-NC-4.0](https://creativecommons.org/licenses/by-nc/4.0/legalcode), see [LICENSE](LICENSE.md) for details.
