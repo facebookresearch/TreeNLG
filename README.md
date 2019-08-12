@@ -39,8 +39,8 @@ We noticed that slightly higher numbers can be obtained by tuning hyper-paramete
 ##### Weather Dataset
 Dataset     |  BLEU |  TreeAcc(whole)  |  TreeAcc(no-discourse)  |  TreeAcc(discourse)  
 ------------|-------|------------------|-------------------------|-----------
-S2S-Tree    | -     |  94.00  |  96.66  |  86.59        
-S2S-Constr  | -     |  97.15   | 98.76  |  94.45         
+S2S-Tree    | 76.12     |  94.00  |  96.66  |  86.59        
+S2S-Constr  | 76.60     |  97.15   | 98.76  |  94.45         
 
 ##### Weather Challenge Dataset
 Dataset     |  BLEU |  TreeAcc(whole)  |  TreeAcc(no-discourse)  |  TreeAcc(discourse)  
