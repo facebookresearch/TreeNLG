@@ -77,10 +77,10 @@ def sequence_to_tree(tokens: List[str]) -> NLGNode:
     """
     Convert list of pred/output tokens to a hierarchical tree and return the root node,
     e.g.,
-    [__DG_INFORM_2__ supposed to __ARG:CONDITION_NOT__ ]
+    [__DG_INFORM_2__ supposed to [__ARG_CONDITION_NOT__ not rain ] ]
     =>
     NLGNode("root", children={
-        NLGNode("[__DG_INFORM_2__", children={NLGNode("__ARG:CONDITION_NOT__")})
+        NLGNode("[__DG_INFORM_2__", children={NLGNode("__ARG_CONDITION_NOT__")})
     })
     """
     node = NLGNode(ROOT, None)
@@ -110,14 +110,14 @@ def scenario_to_tree(tokens: List[str]) -> NLGNode:
     """
     Convert list of scenario tokens to a hierarchical tree and return the root node,
     e.g.,
-    [__DG_INFORM__: [__ARG_TASK__: get_forecast , __ARG_TEMP_HIGH__: 33 ] ]
+    [__DG_INFORM__: [__ARG_TASK__: get_forecast ] [__ARG_TEMP_HIGH__: 33 ] ]
     =>
     NLGNode("root", children={
-        NLGNode("[__1_DG_INFORM__", children={
-            NLGNode("__ARG_TEMP_HIGH__", children={
+        NLGNode("[__DG_INFORM__:", children={
+            NLGNode("[__ARG_TEMP_HIGH__:", children={
                 NLGNode("33")
             }),
-            NLGNode("__ARG_TASK__", children={
+            NLGNode("[__ARG_TASK__:", children={
                 NLGNode("get_forecast")
             })
         })
