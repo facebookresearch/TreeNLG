@@ -21,7 +21,7 @@ note = {To appear}
 
 ## Data
 In addition to the **weather** and enriched **[E2E challenge](https://github.com/tuetschek/e2e-dataset)** dataset from our paper, we released another **weather_challenge** dataset, which contains harder weather scenarios in train/val/test files.
-Each response was collected by providing annotators, who are native English speakers, with a *user query*, a *compositional meaning representation* (with discourse relations and dialog acts), and a *context*. Currently *context* is not provided yet but we will release soon. All of these are made available in our dataset. See our linked paper for more details.
+Each response was collected by providing annotators, who are native English speakers, with a *user query*, and a *compositional meaning representation* (with discourse relations and dialog acts). All of these are made available in our dataset. See our linked paper for more details.
 
 #### Data Statistics
 
@@ -32,6 +32,8 @@ Weather_Challenge  | 32684  |  3397 |  3382  |  -
 E2E      | 42061  |  4672 |  4693  |  230        
 
 `Disc_Test` is a more challenging subset of our test set that contains discourse relations, which is also the subset we report results in `Disc` column in Table 7 in our paper. Note that there are some minor differences of data statistics to our paper, please use the statistics above.
+
+Note: There are some responses in `Weather` dataset which are not provided a user query (141/17/18/4 for train/val/test/disc_test, respectively).  We simply use a "placeholder" token for those missing user queries. 
 
 ## Code
 
