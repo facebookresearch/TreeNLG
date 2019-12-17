@@ -52,6 +52,7 @@ You could port our `constrained_sequence_generator.py` into the [fairseq](https:
 ### Results
 We noticed that slightly higher numbers can be obtained by tuning hyper-parameters compared to the numbers we reported in our paper. Therefore, we update all the automatic numbers (BLEU and tree accuracy) here and please use numbers below when citing our results. For tree accuracy, we report the number on the whole test set, as well as on two disjoint subsets: **no-discourse** subset that contains examples without any discourse act; **discourse** subset contains example with 1+ discourse acts.
 
+Note: The BLEU score is calculated on just the output text, without any of the tree information. We use the BLEU evaluation script provided for the E2E challenge [here](https://github.com/tuetschek/e2e-metrics).  
 ##### Weather Dataset
 Dataset     |  BLEU |  TreeAcc(whole)  |  TreeAcc(no-discourse)  |  TreeAcc(discourse)  
 ------------|-------|------------------|-------------------------|-----------
