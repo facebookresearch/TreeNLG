@@ -12,8 +12,7 @@ if __name__ == "__main__":
     parser.add_argument("-tsv", type=str)
     args = parser.parse_args()
     with open(args.tsv, "r") as f:
-        lines = [l.strip().split("\t") for l in f.readlines()]
-    print("Loaded {} lines".format(len(lines)))
+        lines = [l.lower().strip().split("\t") for l in f.readlines()]
     correct = 0
     for line in lines:
         scenario_tree = scenario_to_tree(line[1].split(" "))
