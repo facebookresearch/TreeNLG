@@ -383,6 +383,8 @@ class ConstrainedSequenceGenerator(SequenceGenerator):
 
             # finalize failure cases that are all beams violate the constraints
             fail_mask = cand_scores.eq(-math.inf).all(-1).unsqueeze(-1).expand(bsz, cand_size)
+            if step >= max_len:
+                fail_mask.fill_(True)
             torch.masked_select(
                 cand_bbsz_idx[:, :beam_size],
                 mask=fail_mask[:, :beam_size],
