@@ -9,16 +9,11 @@ from typing import Dict, List, Set
 OPEN_BRACKET = "["
 CLOSE_BRACKET = "]"
 IGNORE_NON_TERMINALS = {
-    "__arg_task__",
-    "__arg_bad_arg__",
-    "__arg_error_reason__",
-    "__arg_temp_unit__",
     "__ARG_TASK__",
     "__ARG_BAD_ARG__",
     "__ARG_ERROR_REASON__",
     "__ARG_TEMP_UNIT__",
 }
-# match [__ARG_TASK__ task_name ]
 IGNORE_NODE_REGEX = r"\[{} [a-z_]+ \]"
 
 
@@ -393,3 +388,30 @@ class TreeConstraints:
             if not self.next_token(token, i):
                 return False
         return self.meets_all()
+
+    def nominate_nt(self) -> Set[int]:
+        """
+        Nominate possible non-terminals for next step beam search
+        """
+        assert self.valid_input
+        nominated_nt = set()
+        if not self.states:
+            return nominated_nt
+        if self.satisfied:
+            nominated_nt.add(VocabMeta.EOS_TOKEN)
+            return nominated_nt
+        nominated_nt.update(IGNORE_NON_TERMINALS)
+        if self.ignoring_non_terminal > 0:
+            nominated_nt.add(CLOSE_BRACKET)
+        for state in self.states:
+            for node in self.children_map[state.parent]:
+                if node not in state.coverage:
+                    nominated_nt.add(self.node_map[node])
+            if state.parent == -1:
+                continue
+            elif (state.parent not in self.children_map or
+                self.children_map[state.parent] <= state.coverage or
+                state.can_aggregate(self.children_map[state.parent], self.coverage_options)
+            ):
+                nominated_nt.add(CLOSE_BRACKET)
+        return nominated_nt

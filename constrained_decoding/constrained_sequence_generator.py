@@ -34,7 +34,7 @@ class ConstrainedSequenceGenerator(SequenceGenerator):
         super().__init__(tgt_dict, **kwargs)
         self.src_dict = src_dict
         self.tgt_dict = tgt_dict
-        self.nt_map, self.nt_size = self._get_nt(tgt_dict)
+        self.nt_map = self._get_nt(tgt_dict)
 
     def _get_nt(self, vocab):
         """
@@ -48,7 +48,7 @@ class ConstrainedSequenceGenerator(SequenceGenerator):
             if tok[0] != '[' and tok != ']' and tok != '</s>':
                 continue
             nt_map.append(i)
-        return nt_map, len(nt_map)
+        return nt_map
 
     def _build_constraints(self, src_tokens, beam_size):
         """
@@ -70,9 +70,10 @@ class ConstrainedSequenceGenerator(SequenceGenerator):
         """
         constraint_penalty = []
         for con in constraints:
+            nominated_nt = con.nominate_nt()
             constraint_penalty.append([
                 0.0
-                if deepcopy(con).next_token(bracketize(self.tgt_dict[nt]), idx)
+                if self.tgt_dict[nt].strip('[') in nominated_nt
                 else -math.inf
                 for nt in self.nt_map
             ])
@@ -86,7 +87,7 @@ class ConstrainedSequenceGenerator(SequenceGenerator):
         """
         assert len(constraints) == len(next_tokens)
         for constraint, token in zip(constraints, next_tokens):
-            constraint.next_token(bracketize(self.tgt_dict[token]), idx)
+            assert constraint.next_token(bracketize(self.tgt_dict[token]), idx)
 
     def _reorder_constraints(self, constraints, new_indices):
         """
@@ -402,6 +403,15 @@ class ConstrainedSequenceGenerator(SequenceGenerator):
                 out=eos_bbsz_idx,
             )
 
+            fail_mask = torch.zeros_like(eos_mask, dtype=torch.bool)
+            if step >= max_len:
+                fail_mask.fill_(True)
+            torch.masked_select(
+                cand_bbsz_idx[:, :beam_size],
+                mask=fail_mask[:, :beam_size],
+                out=fail_bbsz_idx,
+            )
+
             finalized_sents = set()
             if eos_bbsz_idx.numel() > 0 or fail_bbsz_idx.numel() > 0:
                 torch.masked_select(
@@ -409,8 +419,8 @@ class ConstrainedSequenceGenerator(SequenceGenerator):
                     mask=eos_mask[:, :beam_size],
                     out=eos_scores,
                 )
-                # only apply eos constraints for eos instead of failure cases
-                eos_bbsz_idx, eos_scores = self._apply_eos_constraints(constraints, eos_bbsz_idx, eos_scores)
+                eos_bbsz_idx = torch.cat((eos_bbsz_idx, fail_bbsz_idx))
+                eos_scores = torch.cat((eos_scores, eos_scores.new_full((fail_bbsz_idx.numel(),), -math.inf)))
                 finalized_sents = finalize_hypos(step, eos_bbsz_idx, eos_scores)
                 num_remaining_sent -= len(finalized_sents)
 
