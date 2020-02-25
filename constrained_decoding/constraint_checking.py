@@ -39,11 +39,15 @@ class DecodingState:
         self,
         parent: int,
         coverage: Set[int],
+        cmplt_coverage: Set[int],
         agg_coverage: Set[int],
         node_alignment: Dict[int, int],
     ):
         self.parent: int = parent
-        self.coverage: Set[int] = coverage  # node ids that have been encountered
+        # node ids that have been encountered
+        self.coverage: Set[int] = coverage
+        # node ids that their descendants and themselves have been encountered
+        self.cmplt_coverage: Set[int] = cmplt_coverage
         # tracks nodes that provide aggregration and have occured or
         # can still occur in the future. If a node gets aggregated (i.e. we
         # assume that it will be covered by another node) then it is removed
@@ -55,9 +59,10 @@ class DecodingState:
         self.node_alignment: Dict[int, int] = node_alignment
 
     def __str__(self):
-        return "{} {} {}".format(
+        return "{} {} {} {} {}".format(
             self.parent,
             str(self.coverage),
+            str(self.cmplt_coverage),
             str(self.agg_coverage),
             str(self.node_alignment),
         )
@@ -66,7 +71,9 @@ class DecodingState:
         return str(self)
 
     def can_aggregate(
-        self, children: Set[int], coverage_options: Dict[int, Set[int]]
+        self, children: Set[int],
+        coverage_options: Dict[int, Set[int]],
+        children_map: Dict[int, Set[int]]
     ) -> bool:
         """
         Return True if current non-terminal can consume a closing brace
@@ -76,13 +83,15 @@ class DecodingState:
             coverage_options: nodes that can cover a missing node
         """
         missing_children = children - self.coverage
-        for missing_child in missing_children:
-            if (
-                missing_child not in coverage_options
-                or len(coverage_options[missing_child] & self.agg_coverage) == 0
-            ):
-                # other nodes that can cover the missing child
-                # cannot be generated in the future
+        stack = list(missing_children)
+        while stack:
+            curr_node = stack.pop(-1)
+            curr_opts = coverage_options.get(curr_node, {curr_node})
+            if len(curr_opts & self.cmplt_coverage) > 0:
+                continue
+            elif len(curr_opts & self.agg_coverage) > 1:
+                stack.extend(children_map[curr_node])
+            else:
                 return False
         return True
 
@@ -117,9 +126,8 @@ class TreeConstraints:
         for agg_options in self.coverage_options.values():
             agg_coverage = agg_coverage | agg_options
         # current list of possible states
-        self.states: List[DecodingState] = [DecodingState(-1, set(), agg_coverage, {})]
-        # if we're currently consuming a non-terminal whose constraint is to be
-        # ignored
+        self.states: List[DecodingState] = [DecodingState(-1, set(), set(), agg_coverage, {})]
+        # if we're currently consuming a non-terminal whose constraint is to be ignored
         self.ignoring_non_terminal = 0
         # debug
         self.tokens: List[str] = []
@@ -280,6 +288,7 @@ class TreeConstraints:
                     DecodingState(
                         node,
                         set(state.coverage) | {node},
+                        set(state.cmplt_coverage),
                         set(state.agg_coverage),
                         alignment,
                     )
@@ -298,13 +307,27 @@ class TreeConstraints:
 
         remove_subtrees(missing_children)
 
+    def _does_cmplt_cover(self, state) -> bool:
+        stack = [state.parent]
+        while stack:
+            curr_node = stack.pop(-1)
+            curr_opts = self.coverage_options.get(curr_node, {curr_node})
+            if len(curr_opts & state.cmplt_coverage) > 0:
+                continue
+            elif len(curr_opts & state.coverage) > 0:
+                stack.extend(self.children_map[curr_node])
+            else:
+                return False
+        return True
+
     def _accept_closing_brace(self) -> bool:
         new_states = []
         is_complete = False
         for state in self.states:
-            # update each state with closing brace, save valid states for
-            # for next step
+            # update each state with closing brace, save valid states for next step
             def close_node():
+                if self._does_cmplt_cover(state):
+                    state.cmplt_coverage.add(state.parent)
                 state.parent = self.parent_map[state.parent]
                 new_states.append(state)
                 covered_nodes = set(state.coverage)
@@ -329,7 +352,9 @@ class TreeConstraints:
             ):
                 is_complete = close_node()
             elif state.can_aggregate(
-                self.children_map[state.parent], self.coverage_options
+                self.children_map[state.parent],
+                self.coverage_options,
+                self.children_map
             ):
                 self._remove_coverage_options(state)
                 is_complete = close_node()
@@ -411,7 +436,11 @@ class TreeConstraints:
                 continue
             elif (state.parent not in self.children_map or
                 self.children_map[state.parent] <= state.coverage or
-                state.can_aggregate(self.children_map[state.parent], self.coverage_options)
+                state.can_aggregate(
+                    self.children_map[state.parent],
+                    self.coverage_options,
+                    self.children_map
+                )
             ):
                 nominated_nt.add(CLOSE_BRACKET)
         return nominated_nt

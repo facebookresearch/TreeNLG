@@ -14,21 +14,6 @@ from fairseq.sequence_generator import SequenceGenerator
 from .constraint_checking import TreeConstraints
 
 
-# non-terminal prefix
-NT_PREFIX = "b__"
-
-
-def bracketize(s):
-    """
-    Change the prefix of non-terminal tokens b__ to [__, i.e.,
-    b__dg_inform__ to [__dg_inform__.
-    """
-    tokens = s.split()
-    if len(tokens) <= 1:
-        return re.sub(r"^%s" % NT_PREFIX, "[__", s)
-    else:
-        return " ".join([bracketize(t) for t in tokens])
-
 class ConstrainedSequenceGenerator(SequenceGenerator):
     def __init__(self, src_dict, tgt_dict, **kwargs):
         super().__init__(tgt_dict, **kwargs)
@@ -45,7 +30,7 @@ class ConstrainedSequenceGenerator(SequenceGenerator):
         for i, tok in enumerate(vocab):
             if i >= len(vocab):
                 break
-            if tok[0] != '[' and tok != ']' and tok != '</s>':
+            if tok[0] != '[' and tok != ']' and tok != self.tgt_dict[self.tgt_dict.eos()]:
                 continue
             nt_map.append(i)
         return nt_map
@@ -57,7 +42,7 @@ class ConstrainedSequenceGenerator(SequenceGenerator):
         srcs = [" ".join([self.src_dict[tok] for tok in row]) for row in src_tokens]
         srcs = [s.replace(self.tgt_dict[self.tgt_dict.bos()], "") for s in srcs]
         srcs = [s.replace(self.tgt_dict[self.tgt_dict.eos()], "") for s in srcs]
-        constraints = [TreeConstraints(bracketize(t)) for t in srcs]
+        constraints = [TreeConstraints(t) for t in srcs]
         bbeam_constraints = []
         for constraint in constraints:
             bbeam_constraints.extend([deepcopy(constraint) for i in range(beam_size)])
@@ -69,8 +54,13 @@ class ConstrainedSequenceGenerator(SequenceGenerator):
         Penalize unmet constraints
         """
         constraint_penalty = []
+        permitted_eos = []
         for con in constraints:
             nominated_nt = con.nominate_nt()
+            if self.tgt_dict[self.tgt_dict.eos()] in nominated_nt:
+                permitted_eos.append(True)
+            else:
+                permitted_eos.append(False)
             constraint_penalty.append([
                 0.0
                 if self.tgt_dict[nt].strip('[') in nominated_nt
@@ -79,6 +69,9 @@ class ConstrainedSequenceGenerator(SequenceGenerator):
             ])
         self.constraint_penalty = np.zeros((len(constraint_penalty), self.vocab_size))
         self.constraint_penalty[:, self.nt_map] = np.array(constraint_penalty)
+        if any(permitted_eos):
+            self.constraint_penalty[permitted_eos, :] = -math.inf
+            self.constraint_penalty[permitted_eos, self.tgt_dict.eos()] = 0.0
         lprobs += torch.tensor(self.constraint_penalty, device=lprobs.device)
 
     def _update_constraints(self, constraints, next_tokens, idx):
@@ -87,7 +80,7 @@ class ConstrainedSequenceGenerator(SequenceGenerator):
         """
         assert len(constraints) == len(next_tokens)
         for constraint, token in zip(constraints, next_tokens):
-            assert constraint.next_token(bracketize(self.tgt_dict[token]), idx)
+            assert constraint.next_token(self.tgt_dict[token], idx)
 
     def _reorder_constraints(self, constraints, new_indices):
         """
