@@ -23,10 +23,9 @@ tree_acc () {
 
 grep S- $gen | awk -F '\t' '{print $1}' | sed 's/^S-//' > $id
 grep S- $gen | awk -F '\t' '{print $2}' > $src
-grep T- $gen | awk -F '\t' '{print $2}' > $tgt
 grep H- $gen | awk -F '\t' '{print $3}' > $hyp
 
-paste $id $src $hyp $tgt > $tsv
+paste $id $src $hyp > $tsv
 
 tree_acc $tsv
 

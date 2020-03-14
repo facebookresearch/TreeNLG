@@ -52,18 +52,17 @@ Computing tree accuracy:
 python scripts/compute_tree_acc.py -tsv example/seq2seq_out.tsv
 ```
 
-This should give you 0.8511 tree accuracy. Output file should be tab-separated with columns `id, input, pred, target`.
+This should give you 94.65% tree accuracy. Output file should be tab-separated with columns `id, input, pred`.
 
 ### Constrained Decoding
 
-[fairseq](https://github.com/pytorch/fairseq) should be installed at the very begining, refering to [Requirements and Installation of Fairseq](https://github.com/pytorch/fairseq#requirements-and-installation). The code is tested on commit `8185722` of [fairseq](https://github.com/pytorch/fairseq). Now, get started with the following bash scripts.
+[fairseq](https://github.com/pytorch/fairseq) should be installed at the very begining, refering to [Requirements and Installation of Fairseq](https://github.com/pytorch/fairseq#requirements-and-installation). The code is tested on commit `6234e29` of [fairseq](https://github.com/pytorch/fairseq). Now, get started with the following bash scripts.
 
 ```bash
 bash scripts/prepare.weather.sh # preparing data
 bash scripts/preprocess.weather.sh
-bash scripts/prepare.glove.sh # use GloVe pretained embeddings
-bash scripts/train.weather.lstm.glove.sh # training a simple model
-bash scripts/generate.weather.lstm.glove.sh # generating with constrainted decoding
+bash scripts/train.weather.lstm.sh # training a simple model
+bash scripts/generate.weather.lstm.sh # generating with constrainted decoding
 ```
 
 ### Results

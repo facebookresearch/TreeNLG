@@ -23,11 +23,6 @@ tree_acc () {
 
 del=`grep H- $gen | awk -F '\t' '$2=="-inf" {print $1}' | cut -d '-' -f 2 | awk '{print $1+1}'`
 
-#grep S- $gen | awk -F '\t' '{print $1}' | sed 's/^S-//' > $id
-#grep S- $gen | awk -F '\t' '{print $2}' > $src
-#grep T- $gen | awk -F '\t' '{print $2}' > $tgt
-#grep H- $gen | awk -F '\t' '{print $3}' > $hyp
-
 awk 'NR==FNR{l[$0];next;} !(FNR in l)' <(echo "$del") \
   <(grep S- $gen | sort -n -k 2 -t -) | \
   awk -F '\t' '{print $1}' | sed 's/^S-//' > $id
@@ -37,14 +32,10 @@ awk 'NR==FNR{l[$0];next;} !(FNR in l)' <(echo "$del") \
   awk -F '\t' '{print $2}' > $src
 
 awk 'NR==FNR{l[$0];next;} !(FNR in l)' <(echo "$del") \
-  <(grep T- $gen | sort -n -k 2 -t -) | \
-  awk -F '\t' '{print $2}' > $tgt
-
-awk 'NR==FNR{l[$0];next;} !(FNR in l)' <(echo "$del") \
   <(grep H- $gen | sort -n -k 2 -t -) | \
   awk -F '\t' '{print $3}' > $hyp
 
-paste $id $src $hyp $tgt > $tsv
+paste $id $src $hyp > $tsv
 
 tree_acc $tsv
 
