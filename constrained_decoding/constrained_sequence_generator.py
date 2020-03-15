@@ -15,10 +15,11 @@ from .constraint_checking import TreeConstraints
 
 
 class ConstrainedSequenceGenerator(SequenceGenerator):
-    def __init__(self, src_dict, tgt_dict, **kwargs):
+    def __init__(self, src_dict, tgt_dict, order_constr, **kwargs):
         super().__init__(tgt_dict, **kwargs)
         self.src_dict = src_dict
         self.tgt_dict = tgt_dict
+        self.order_constr = order_constr
         self.nt_map = self._get_nt(tgt_dict)
 
     def _get_nt(self, vocab):
@@ -42,7 +43,7 @@ class ConstrainedSequenceGenerator(SequenceGenerator):
         srcs = [" ".join([self.src_dict[tok] for tok in row]) for row in src_tokens]
         srcs = [s.replace(self.tgt_dict[self.tgt_dict.bos()], "") for s in srcs]
         srcs = [s.replace(self.tgt_dict[self.tgt_dict.eos()], "") for s in srcs]
-        constraints = [TreeConstraints(t) for t in srcs]
+        constraints = [TreeConstraints(t, self.order_constr) for t in srcs]
         bbeam_constraints = []
         for constraint in constraints:
             bbeam_constraints.extend([deepcopy(constraint) for i in range(beam_size)])

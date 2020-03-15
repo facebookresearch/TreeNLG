@@ -10,6 +10,7 @@ def build_generator(self, args):
     dicts = (self.source_dictionary, self.target_dictionary)
     return seq_gen_cls(
         *dicts,
+        order_constr=getattr(args, 'order_constr', False),
         beam_size=getattr(args, 'beam', 5),
         max_len_a=getattr(args, 'max_len_a', 0),
         max_len_b=getattr(args, 'max_len_b', 200),

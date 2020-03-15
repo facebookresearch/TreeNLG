@@ -102,7 +102,13 @@ class TreeConstraints:
     object corresponds to one candidate in beam.
     """
 
-    def __init__(self, input_tree: str):
+    def __init__(
+        self,
+        input_tree: str,
+        order_constr: bool = False
+    ):
+        # activate order constraints
+        self.order_constr = order_constr
         # map from non-terminal tokens to input nodes at which they're valid.
         self.non_terminal_map: Dict[str, Set[int]] = defaultdict(set)
         # map input nodes to their parents
@@ -272,13 +278,20 @@ class TreeConstraints:
         new_states = []
         for state in self.states:
             # check each state if it accepts the nt
+            uncovered_children = [
+                node for node in self.children_map[state.parent]
+                if node not in state.coverage
+            ]
+            if (
+                self.order_constr and
+                state.parent != -1 and
+                self.node_map[state.parent] == '__DS_JOIN__'
+            ):
+                uncovered_children.sort()
+                uncovered_children = uncovered_children[:1]
             for node in self.non_terminal_map[nt]:
                 # do for all possible nodes the nt can map to
-                if (
-                    self.parent_map[node] != state.parent
-                    or node not in self.children_map[state.parent]
-                    or node in state.coverage
-                ):
+                if node not in uncovered_children:
                     # this state can't accept this node
                     continue
                 alignment = dict(state.node_alignment)
@@ -429,9 +442,18 @@ class TreeConstraints:
         if self.ignoring_non_terminal > 0:
             nominated_nt.add(CLOSE_BRACKET)
         for state in self.states:
-            for node in self.children_map[state.parent]:
-                if node not in state.coverage:
-                    nominated_nt.add(self.node_map[node])
+            uncovered_children = [
+                node for node in self.children_map[state.parent]
+                if node not in state.coverage
+            ]
+            if (
+                self.order_constr and
+                state.parent != -1 and
+                self.node_map[state.parent] == '__DS_JOIN__'
+            ):
+                uncovered_children.sort()
+                uncovered_children = uncovered_children[:1]
+            nominated_nt.update([self.node_map[nt] for nt in uncovered_children])
             if state.parent == -1:
                 continue
             elif (state.parent not in self.children_map or
