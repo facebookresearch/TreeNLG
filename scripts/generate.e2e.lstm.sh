@@ -9,15 +9,16 @@ SAVEDIR=checkpoints/$data.$model
 testpfx=test
 gen=gen.constr.txt
 
-fairseq-generate data-bin/$data \
+fairseq-generate data-prep/$data \
   --user-dir . `# delete this line to decode without constraints` \
   --gen-subset $testpfx `# test prefix` \
   --path $SAVEDIR/checkpoint_best.pt \
+  --dataset-impl raw \
   --max-sentences 128 \
   --beam 5 \
-  --max-len-a 2 --max-len-b 200 \
+  --max-len-a 2 --max-len-b 50 \
   > $SAVEDIR/$gen
 
-bash scripts/measure_scores.e2e.sh $SAVEDIR/$gen data-prep/$data/$testpfx.ar
+bash scripts/measure_scores.e2e.sh $SAVEDIR/$gen data-prep/$data/$testpfx.mr-ar.ar
 bash scripts/tree_acc.sh $SAVEDIR/$gen
 bash scripts/count_failure_cases.sh $SAVEDIR/$gen

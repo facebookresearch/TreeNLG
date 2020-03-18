@@ -8,7 +8,7 @@ SAVEDIR=checkpoints/weather_challenge.lstm
 
 mkdir -p $SAVEDIR
 
-fairseq-train data-bin/weather_challenge \
+fairseq-train data-prep/weather_challenge \
   --user-dir . \
   --task translation --arch lstm \
   --max-epoch 100 --patience 5 \
@@ -20,6 +20,7 @@ fairseq-train data-bin/weather_challenge \
   --encoder-embed-dim 300 --decoder-embed-dim 300 \
   --encoder-hidden-size 128 --decoder-hidden-size 128 \
   --encoder-layers 1 --decoder-layers 1 \
+  --dataset-impl raw \
   --save-dir $SAVEDIR \
   --no-epoch-checkpoints \
   | tee $SAVEDIR/log.txt

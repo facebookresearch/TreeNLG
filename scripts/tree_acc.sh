@@ -12,7 +12,6 @@ tmp=scripts/tmp
 tsv=$tmp/tsv
 id=$tmp/id
 src=$tmp/src
-tgt=$tmp/tgt
 hyp=$tmp/hyp
 
 mkdir -p $tmp

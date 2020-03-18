@@ -56,13 +56,12 @@ This should give you 94.65% tree accuracy. Output file should be tab-separated w
 
 ### Constrained Decoding
 
-[fairseq](https://github.com/pytorch/fairseq) should be installed at the very begining, refering to [Requirements and Installation of Fairseq](https://github.com/pytorch/fairseq#requirements-and-installation). The code is tested on commit `6234e29` of [fairseq](https://github.com/pytorch/fairseq). Now, get started with the following bash scripts.
+[fairseq](https://github.com/pytorch/fairseq) should be installed at the very begining, refering to [Requirements and Installation of Fairseq](https://github.com/pytorch/fairseq#requirements-and-installation). The code is tested on commit `3822db3` of [fairseq](https://github.com/pytorch/fairseq). Now, get started with the following bash scripts.
 
 ```bash
-bash scripts/prepare.weather.sh # preparing data
-bash scripts/preprocess.weather.sh
-bash scripts/train.weather.lstm.sh # training a simple model
-bash scripts/generate.weather.lstm.sh # generating with constrainted decoding
+bash scripts/prepare.weather.sh
+bash scripts/train.weather.lstm.sh
+bash scripts/generate.weather.lstm.sh
 ```
 
 ### Results
