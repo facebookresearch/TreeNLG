@@ -1,13 +1,14 @@
 #!/bin/bash
 
 if [ $# -eq 2 ]; then
-  gen=`readlink -f $1`
-  base=`readlink -f $2`
+  gen=$(readlink -f $1)
+  base=$(readlink -f $2)
 else
   echo "Usage: tree_acc hypothesis baseline"
+  exit
 fi
 
-cd `dirname $0`/..
+cd $(dirname $0)/..
 
 tmp=scripts/tmp
 tsv=$tmp/tsv
@@ -23,7 +24,7 @@ tree_acc () {
   python compute_tree_acc.py -tsv $1
 }
 
-repl=`grep H- $gen | awk -F '\t' '$2=="-inf" {print $1}' | cut -d '-' -f 2 | awk '{print $1+1}'`
+repl=$(grep H- $gen | awk -F '\t' '$2=="-inf" {print $1}' | cut -d '-' -f 2 | awk '{print $1+1}')
 
 grep S- $gen | sort -n -k 2 -t - | awk -F '\t' '{print $1}' | sed 's/^S-//' > $id
 

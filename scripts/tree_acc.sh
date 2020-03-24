@@ -1,12 +1,12 @@
 #!/bin/bash
 
 if [ $# -eq 1 ]; then
-  gen=`readlink -f $1`
+  gen=$(readlink -f $1)
 else
   echo "Usage: tree_acc hypothesis"
 fi
 
-cd `dirname $0`/..
+cd $(dirname $0)/..
 
 tmp=scripts/tmp
 tsv=$tmp/tsv

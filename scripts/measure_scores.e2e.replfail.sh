@@ -1,15 +1,15 @@
 #!/bin/bash
 
 if [ $# -eq 3 ]; then
-  gen=`readlink -f $1`
-  base=`readlink -f $2`
-  ref_tree=`readlink -f $3`
+  gen=$(readlink -f $1)
+  base=$(readlink -f $2)
+  ref_tree=$(readlink -f $3)
 else
   echo "Usage: measure_scores hypothesis reference baseline"
-  exit 0
+  exit
 fi
 
-cd `dirname $0`/..
+cd $(dirname $0)/..
 
 if [ ! -d e2e-metrics ]; then
   echo 'Cloning e2e-metrics github repository...'
@@ -35,7 +35,7 @@ rmtreeinfo () {
   sed 's/\[\w\+//g' | sed 's/\]//g' | awk '{$1=$1;print}'
 }
 
-repl=`grep H- $gen | awk -F '\t' '$2=="-inf" {print $1}' | cut -d '-' -f 2 | awk '{print $1+1}'`
+repl=$(grep H- $gen | awk -F '\t' '$2=="-inf" {print $1}' | cut -d '-' -f 2 | awk '{print $1+1}')
 
 awk 'NR==FNR{l[$0];next;} (FNR in l)' <(echo "$repl") \
   <(grep H- $base | sort -n -k 2 -t -) > $baserepl

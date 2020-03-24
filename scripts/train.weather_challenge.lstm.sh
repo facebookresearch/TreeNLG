@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd `dirname $0`/..
+cd $(dirname $0)/..
 
 TMPDIR=/tmp
 CUDA_VISIBLE_DEVICES=0
