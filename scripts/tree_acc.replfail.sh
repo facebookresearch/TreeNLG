@@ -14,8 +14,6 @@ tmp=scripts/tmp
 tsv=$tmp/tsv
 id=$tmp/id
 src=$tmp/src
-baserepl=$tmp/baserepl
-hyprepl=$tmp/hyprepl
 hyp=$tmp/hyp
 
 mkdir -p $tmp
@@ -24,20 +22,13 @@ tree_acc () {
   python compute_tree_acc.py -tsv $1
 }
 
-repl=$(grep H- $gen | awk -F '\t' '$2=="-inf" {print $1}' | cut -d '-' -f 2 | awk '{print $1+1}')
-
 grep S- $gen | sort -n -k 2 -t - | awk -F '\t' '{print $1}' | sed 's/^S-//' > $id
-
 grep S- $gen | sort -n -k 2 -t - | awk -F '\t' '{print $2}' > $src
 
-awk 'NR==FNR{l[$0];next;} (FNR in l)' <(echo "$repl") \
-  <(grep H- $base | sort -n -k 2 -t -) > $baserepl
-
-awk 'NR==FNR{l[$0];next;} !(FNR in l)' <(echo "$repl") \
-  <(grep H- $gen | sort -n -k 2 -t -) > $hyprepl
-
-cat $baserepl >> $hyprepl
-cat $hyprepl | sort -n -k 2 -t - | awk -F '\t' '{print $3}' > $hyp
+repl=$(grep H- $gen | awk -F '\t' '$2=="-inf" {print $1}' | cut -d '-' -f 2 | awk '{print $1+1}')
+awk -F '\t' 'NR==FNR {l[$0];next;} !(FNR in l) {print $3} (FNR in l) {print $6}' \
+  <(echo "$repl") <(paste <(grep H- $gen | sort -n -k 2 -t -) <(grep H- $base | sort -n -k 2 -t -)) \
+  > $hyp
 
 paste $id $src $hyp > $tsv
 

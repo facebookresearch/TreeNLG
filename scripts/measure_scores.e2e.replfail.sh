@@ -23,8 +23,6 @@ fi
 SCORER=e2e-metrics/measure_scores.py
 org=data/E2E_compositional/testset_w_refs.csv
 tmp=scripts/tmp
-baserepl=$tmp/baserepl
-hyprepl=$tmp/hyprepl
 hyp=$tmp/hyp
 ref=$tmp/ref
 src=$tmp/src
@@ -36,18 +34,11 @@ rmtreeinfo () {
 }
 
 repl=$(grep H- $gen | awk -F '\t' '$2=="-inf" {print $1}' | cut -d '-' -f 2 | awk '{print $1+1}')
-
-awk 'NR==FNR{l[$0];next;} (FNR in l)' <(echo "$repl") \
-  <(grep H- $base | sort -n -k 2 -t -) > $baserepl
-
-awk 'NR==FNR{l[$0];next;} !(FNR in l)' <(echo "$repl") \
-  <(grep H- $gen | sort -n -k 2 -t -) > $hyprepl
-
-cat $baserepl >> $hyprepl
-cat $hyprepl | sort -n -k 2 -t - | awk -F '\t' '{print $3}' | rmtreeinfo > $hyp
+awk -F '\t' 'NR==FNR {l[$0];next;} !(FNR in l) {print $3} (FNR in l) {print $6}' \
+  <(echo "$repl") <(paste <(grep H- $gen | sort -n -k 2 -t -) <(grep H- $base | sort -n -k 2 -t -)) | \
+  rmtreeinfo > $hyp
 
 cat $ref_tree | rmtreeinfo > $ref
-
 tail -n +2 $org | cut -d '"' -f 2 > $src
 
 python scripts/_eval_e2e_helper.py
