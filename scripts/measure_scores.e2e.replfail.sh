@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 
 if [ $# -eq 3 ]; then
   gen=$(readlink -f $1)

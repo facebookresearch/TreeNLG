@@ -1,3 +1,5 @@
+# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+
 from fairseq import options
 from fairseq.options import add_generation_args
 

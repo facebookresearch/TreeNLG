@@ -1,3 +1,5 @@
+# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+
 import torch.optim.lr_scheduler
 
 from fairseq.optim.lr_scheduler.reduce_lr_on_plateau import ReduceLROnPlateau
